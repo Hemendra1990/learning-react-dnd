@@ -12,33 +12,41 @@ export default function Playground() {
 
   const [pgElements, setPGElements] = useState([]);
 
-  const [{ canDrop, isOver }, drop] = useDrop(() => ({
-    accept: "hdElement",
-    drop: (item) => {
+  const handleWhenElementMovedToContainer = (item) => {
+    console.log(item);
+  }
+
+  const [{ canDrop, isOver, getDropResult }, drop] = useDrop(() => ({
+    accept: ["hdElement", "hdPGElement"],
+    drop: (item, monitor) => {
+      
+        //Check if the element is already dropped somewhere, could be a case of Container
+        if(monitor.didDrop()) {
+          return;
+        }
+
         const {index, element} = item;
         console.log(item);
-        element.id = window.crypto.randomUUID();
-        /* setMeta((prevMeta)=> {
-            
-            prevMeta.elements.push(element);
-            return {
-                ...prevMeta
-            }
-        });
-        console.log(meta); */
-        setPGElements(elements=> [...elements, element])
+        const id = window.crypto.randomUUID();
+        console.log(pgElements);
+        if(monitor.getItemType() === "hdPGElement") {
+          //Do not create any new element, just reorder them
+        } else { //add to the plaground and create the element
+          setPGElements(elements => [...elements, {...element, id}])
+        }
     },
     collect: (monitor) => ({
       isOver: monitor.isOver(),
       canDrop: monitor.canDrop(),
+      getDropResult: monitor.getDropResult()
     }),
   }));
   const isActive = canDrop && isOver;
-  let backgroundColor = "#222";
+  let backgroundColor = "";
   if (isActive) {
-    backgroundColor = "darkgreen";
+    backgroundColor = "lightgreen";
   } else if (canDrop) {
-    backgroundColor = "darkkhaki";
+    backgroundColor = "green";
   }
 
   return (
@@ -46,8 +54,9 @@ export default function Playground() {
       <div
         style={{
           display: "flex",
-          alignContent: "center",
+          alignItems: "start",
           justifyContent: "center",
+          flexWrap: "wrap",
           border: "2px solid green",
         }}
       >
@@ -59,10 +68,22 @@ export default function Playground() {
 
       <div
         ref={drop}
-        style={{ margin: "20px", border: "solid 2px pink", minHeight: "50vh" }}
+        style={
+          { 
+            display: "flex",
+            alignItems: "start",
+            justifyContent: "center",
+            flexWrap: "wrap",
+            margin: "20px", 
+            border: "solid 2px #222", 
+            minHeight: "50vh",
+            backgroundColor:backgroundColor
+          }
+        }
       >
-        {pgElements.map((metaElement, index) => {
-            return <DraggablePGElement key={metaElement.id} element={metaElement} meta={meta} setMeta={setMeta}/>
+        {console.log("pg Elements:",pgElements.length, pgElements)}
+        {pgElements.map((element, index) => {
+            return <DraggablePGElement key={element.id} element={element} meta={meta} setMeta={setMeta} handleWhenElementMovedToContainer={handleWhenElementMovedToContainer}/>
         })}
       </div>
     </>

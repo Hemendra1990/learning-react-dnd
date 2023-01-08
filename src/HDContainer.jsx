@@ -2,18 +2,33 @@ import React, { useState } from "react";
 import { useDrop } from "react-dnd";
 import DraggablePGElement from "./DraggablePGElement";
 
-function HDContainer({ element, meta, setMeta }) {
-  const [containerChildren, setContainerChildren] = useState([]);
-  const [{ canDrop, isOver }, drop] = useDrop(() => ({
-    accept: ["hdPGElement"],
-    drop: (item) => {
-      const { index, element } = item;
-      console.log('Container Item', item);
-      element.attributes = element.attributes || {};
-      element.attributes.children = element.attributes.children || [];
-      element.attributes.children.push(item);
+function HDContainer({ element , meta, setMeta, handleWhenElementMovedToContainer }) {
+  const containerElement = element;
 
-      setContainerChildren(element.attributes.children);
+  const [containerChildren, setContainerChildren] = useState([]);
+
+  containerElement.attributes = containerElement.attributes || {};
+      containerElement.attributes.children = containerElement.attributes.children || [];
+
+  const [{ canDrop, isOver }, drop] = useDrop(() => ({
+    accept: ["hdPGElement", "hdElement"],
+    drop: (item, monitor) => {
+      console.log('Container Item', item);
+
+      //check if the element is already dropped or not
+      if(monitor.didDrop()) {
+        return;
+      }
+
+      if(monitor.getItemType() === "hdElement") {
+        const newId = window.crypto.randomUUID()
+        containerElement.attributes.children.push({...item.element, id: newId});
+        setContainerChildren(children => [...children, {...item.element, id: newId}]);
+      } else if(monitor.getItemType() === "hdPGElement"){
+        //Remove from the main pgElements and add as the child of the container.
+        /* setContainerChildren(children => [...children, {item, id: window.crypto.randomUUID()}]);
+        handleWhenElementMovedToContainer(element); */
+      }
     },
     collect: (monitor) => ({
       isOver: monitor.isOver(),
@@ -21,18 +36,26 @@ function HDContainer({ element, meta, setMeta }) {
     }),
   }));
   const isActive = canDrop && isOver;
-  let backgroundColor = "#222";
+  let backgroundColor = "";
   if (isActive) {
-    backgroundColor = "darkgreen";
+    backgroundColor = "green";
   } else if (canDrop) {
-    backgroundColor = "darkkhaki";
+    backgroundColor = "lightgreen";
   }
-  return <div ref={drop} style={{minHeight:"100px", border: "1px dashed gray", margin: "20px"}}>
+  return <div ref={drop} style={
+    {
+      minHeight:"100px", 
+      minWidth:'50vw', 
+      margin: "20px", 
+      border: "1px dashed gray",
+      backgroundColor: backgroundColor,
+    }
+    }>
     {
         containerChildren.map(childElement => {
-            return <div key={childElement.element.id}>
-                {childElement.element.name}
-                <DraggablePGElement  element={childElement.element} meta={meta} setMeta={setMeta}/>
+            return <div key={childElement.id}>
+                {console.log('Rendering Container elements: ', childElement)}
+                <DraggablePGElement  element={childElement} meta={meta} setMeta={setMeta}/>
             </div>
         })
     }

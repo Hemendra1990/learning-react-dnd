@@ -1,7 +1,7 @@
 import React, { createElement } from "react";
 import { useDrag } from "react-dnd";
 
-const DraggablePGElement = React.forwardRef(({ element, meta, setMeta }, ref) => {
+const DraggablePGElement = React.forwardRef(({ element, meta, setMeta, handleWhenElementMovedToContainer }, ref) => {
   const [{ isDragging }, drag] = useDrag(() => ({
     type: "hdPGElement",
     item: { element },
@@ -22,11 +22,12 @@ const DraggablePGElement = React.forwardRef(({ element, meta, setMeta }, ref) =>
         key: element.id,
         element: element,
         meta,
-        setMeta
+        setMeta,
+        handleWhenElementMovedToContainer
     });
   }
 
-  return <div style={{border: "2px solid yellow"}} ref={drag}>
+  return <div style={{border: "2px solid #777"}} ref={drag}>
     {createComponent()}
   </div>;
 });
