@@ -1,14 +1,18 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useDrop } from "react-dnd";
 import DraggablePGElement from "./DraggablePGElement";
 
-function HDContainer({ element , meta, setMeta, handleWhenElementMovedToContainer }) {
+function HDContainer({ element , meta, setMeta, handleWhenElementMovedToContainer, setPGElements, pgElements }) {
   const containerElement = element;
 
   const [containerChildren, setContainerChildren] = useState([]);
 
   containerElement.attributes = containerElement.attributes || {};
       containerElement.attributes.children = containerElement.attributes.children || [];
+
+      /* useEffect(()=>{
+        
+      }, [containerChildren]) */
 
   const [{ canDrop, isOver }, drop] = useDrop(() => ({
     accept: ["hdPGElement", "hdElement"],
@@ -26,15 +30,17 @@ function HDContainer({ element , meta, setMeta, handleWhenElementMovedToContaine
         setContainerChildren(children => [...children, {...item.element, id: newId}]);
       } else if(monitor.getItemType() === "hdPGElement"){
         //Remove from the main pgElements and add as the child of the container.
-        /* setContainerChildren(children => [...children, {item, id: window.crypto.randomUUID()}]);
-        handleWhenElementMovedToContainer(element); */
+        setContainerChildren(children => [...children, {...item.element}]);
+        console.log(pgElements);
+        console.log(setPGElements);
+        handleWhenElementMovedToContainer(item.element);
       }
     },
     collect: (monitor) => ({
       isOver: monitor.isOver(),
       canDrop: monitor.canDrop(),
     }),
-  }));
+  }), [pgElements]);
   const isActive = canDrop && isOver;
   let backgroundColor = "";
   if (isActive) {

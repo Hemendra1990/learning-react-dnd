@@ -4,7 +4,7 @@ import elements from "./Components";
 import ControlPanel from "./ControlPanel";
 import DraggablePGElement from "./DraggablePGElement";
 
-export default function Playground() {
+const Playground = () => {
     const sharedMeta = {
         elements: []
     };
@@ -12,19 +12,18 @@ export default function Playground() {
 
   const [pgElements, setPGElements] = useState([]);
 
-  const handleWhenElementMovedToContainer = (item) => {
+  function handleWhenElementMovedToContainer(item) {
     console.log(item);
+    console.log('pgElements Length: ', pgElements.length);
   }
 
   const [{ canDrop, isOver, getDropResult }, drop] = useDrop(() => ({
     accept: ["hdElement", "hdPGElement"],
     drop: (item, monitor) => {
-      
         //Check if the element is already dropped somewhere, could be a case of Container
         if(monitor.didDrop()) {
           return;
         }
-
         const {index, element} = item;
         console.log(item);
         const id = window.crypto.randomUUID();
@@ -40,7 +39,7 @@ export default function Playground() {
       canDrop: monitor.canDrop(),
       getDropResult: monitor.getDropResult()
     }),
-  }));
+  }), [pgElements]);
   const isActive = canDrop && isOver;
   let backgroundColor = "";
   if (isActive) {
@@ -82,10 +81,19 @@ export default function Playground() {
         }
       >
         {console.log("pg Elements:",pgElements.length, pgElements)}
-        {pgElements.map((element, index) => {
-            return <DraggablePGElement key={element.id} element={element} meta={meta} setMeta={setMeta} handleWhenElementMovedToContainer={handleWhenElementMovedToContainer}/>
-        })}
+        {pgElements.map((element, index) => (
+            <DraggablePGElement 
+              key={element.id} 
+              element={element} 
+              meta={meta} 
+              setMeta={setMeta}
+              setPGElements={setPGElements}
+              pgElements = {pgElements}
+              handleWhenElementMovedToContainer={handleWhenElementMovedToContainer}/>)
+        )}
       </div>
     </>
   );
 }
+
+export default Playground;
