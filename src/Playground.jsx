@@ -68,9 +68,9 @@ const Playground = () => {
   const isActive = canDrop && isOver;
   let backgroundColor = "";
   if (isActive) {
-    backgroundColor = "lightgreen";
+    backgroundColor = "gray";
   } else if (canDrop) {
-    backgroundColor = "green";
+    backgroundColor = "darkgray";
   }
 
   return (

@@ -27,10 +27,27 @@ function HDContainer({ element , meta, setMeta, handleWhenElementMovedToContaine
         return;
       }
 
+      console.log(setPGElements, pgElements, findElement);
+
       if(monitor.getItemType() === "hdElement") {
         const newId = window.crypto.randomUUID()
-        containerElement.attributes.children.push({...item.element, id: newId});
+        //containerElement.attributes.children.push({...item.element, id: newId});
         setContainerChildren(children => [...children, {...item.element, id: newId}]);
+        setPGElements((prevPGElements) => {
+          let foundElement = null;
+          for (let obj of prevPGElements) {
+            foundElement = findElement(obj, containerElement.id);
+            if (foundElement) {
+              foundElement.attributes = foundElement.attributes || {};
+              foundElement.attributes.children = foundElement.attributes.children || [];
+              foundElement.attributes.children.push({...item.element, id: newId});
+              break;
+            }
+          }
+          return [
+            ...prevPGElements,
+          ]
+        });
       } else if(monitor.getItemType() === "hdPGElement"){
         //Remove from the main pgElements and add as the child of the container.
         setContainerChildren(children => [...children, {...item.element}]);
@@ -44,10 +61,26 @@ function HDContainer({ element , meta, setMeta, handleWhenElementMovedToContaine
       canDrop: monitor.canDrop(),
     }),
   }), [pgElements]);
+
+  function findElement(obj, elementId) {
+    if (obj.id && obj.id === elementId) {
+      return obj;
+    }
+    if (obj.attributes && obj.attributes.children) {
+      for (let child of obj.attributes.children) {
+        const result = findElement(child, elementId);
+        if (result) {
+          return result;
+        }
+      }
+    }
+    return null;
+  }
+
   const isActive = canDrop && isOver;
   let backgroundColor = "";
   if (isActive) {
-    backgroundColor = "green";
+    backgroundColor = "gray";
   } else if (canDrop) {
     backgroundColor = "";
   }
@@ -62,9 +95,15 @@ function HDContainer({ element , meta, setMeta, handleWhenElementMovedToContaine
     }>
     {
         containerChildren.map((childElement, containerIndex) => {
-            return <div key={childElement.id}>
-                {console.log('Rendering Container elements: ', childElement)}
-                <DraggablePGElement  element={childElement} pgIndex={pgIndex} containerIndex={containerIndex}/>
+            return <div key={childElement.id} style={{marginTop: 10, marginBottom: 10}}>
+                <DraggablePGElement 
+                element={childElement} 
+                pgIndex={pgIndex} 
+                meta={meta} 
+                setMeta={setMeta}
+                setPGElements={setPGElements}
+              pgElements = {pgElements}
+                containerIndex={containerIndex}/>
             </div>
         })
     }
