@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useDrop } from "react-dnd";
 import DraggablePGElement from "./DraggablePGElement";
 
-function HDContainer({ element , meta, setMeta, handleWhenElementMovedToContainer, setPGElements, pgElements }) {
+function HDContainer({ element , meta, setMeta, handleWhenElementMovedToContainer, setPGElements, pgElements, pgIndex }) {
   const containerElement = element;
 
   const [containerChildren, setContainerChildren] = useState([]);
@@ -16,8 +16,11 @@ function HDContainer({ element , meta, setMeta, handleWhenElementMovedToContaine
 
   const [{ canDrop, isOver }, drop] = useDrop(() => ({
     accept: ["hdPGElement", "hdElement"],
+    hover: (item, monitor)=>{
+      console.log(item, monitor);
+    },
     drop: (item, monitor) => {
-      console.log('Container Item', item);
+      //console.log('Container Item', item);
 
       //check if the element is already dropped or not
       if(monitor.didDrop()) {
@@ -31,9 +34,9 @@ function HDContainer({ element , meta, setMeta, handleWhenElementMovedToContaine
       } else if(monitor.getItemType() === "hdPGElement"){
         //Remove from the main pgElements and add as the child of the container.
         setContainerChildren(children => [...children, {...item.element}]);
-        console.log(pgElements);
-        console.log(setPGElements);
-        handleWhenElementMovedToContainer(item.element);
+        //console.log(pgElements);
+        //console.log(setPGElements);
+        handleWhenElementMovedToContainer(item.element, item.index);
       }
     },
     collect: (monitor) => ({
@@ -46,7 +49,7 @@ function HDContainer({ element , meta, setMeta, handleWhenElementMovedToContaine
   if (isActive) {
     backgroundColor = "green";
   } else if (canDrop) {
-    backgroundColor = "lightgreen";
+    backgroundColor = "";
   }
   return <div ref={drop} style={
     {
@@ -58,10 +61,10 @@ function HDContainer({ element , meta, setMeta, handleWhenElementMovedToContaine
     }
     }>
     {
-        containerChildren.map(childElement => {
+        containerChildren.map((childElement, containerIndex) => {
             return <div key={childElement.id}>
                 {console.log('Rendering Container elements: ', childElement)}
-                <DraggablePGElement  element={childElement} meta={meta} setMeta={setMeta}/>
+                <DraggablePGElement  element={childElement} pgIndex={pgIndex} containerIndex={containerIndex}/>
             </div>
         })
     }

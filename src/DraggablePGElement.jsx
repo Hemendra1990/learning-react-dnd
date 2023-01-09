@@ -1,11 +1,12 @@
 import React, { createElement } from "react";
 import { useDrag } from "react-dnd";
 
-const DraggablePGElement = React.forwardRef(({ element, meta, setMeta, handleWhenElementMovedToContainer, setPGElements, pgElements }, ref) => {
+const DraggablePGElement = React.forwardRef((
+  { element, meta, setMeta, handleWhenElementMovedToContainer, setPGElements, pgElements, pgIndex, containerIndex }, ref) => {
   
   const [{ isDragging }, drag] = useDrag(() => ({
     type: "hdPGElement",
-    item: { element },
+    item: { pgIndex, element },
     end: (item, monitor) => {
       const dropResult = monitor.getDropResult();
       if (item && dropResult) {
@@ -26,7 +27,9 @@ const DraggablePGElement = React.forwardRef(({ element, meta, setMeta, handleWhe
         setMeta,
         handleWhenElementMovedToContainer,
         setPGElements,
-        pgElements
+        pgElements,
+        pgIndex,
+        containerIndex
     });
   }
 

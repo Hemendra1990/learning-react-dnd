@@ -12,24 +12,49 @@ const Playground = () => {
 
   const [pgElements, setPGElements] = useState([]);
 
-  function handleWhenElementMovedToContainer(item) {
-    console.log(item);
+  function deleteElement(array, element) {
+    for (let i = 0; i < array.length; i++) {
+      if (array[i].name === element) {
+        array.splice(i, 1);
+        return array;
+      } else {
+        deleteElement(array[i].children, element);
+      }
+    }
+    return array;
+  }
+
+  function handleWhenElementMovedToContainer(item, index) {
+    /* console.log(item);
+    console.log(index); */
+    const itemAtIndex = pgElements.findIndex(ele => ele.id === item.id);
+    pgElements.splice(itemAtIndex, 1);
+    setPGElements([...pgElements]);
     console.log('pgElements Length: ', pgElements.length);
   }
 
   const [{ canDrop, isOver, getDropResult }, drop] = useDrop(() => ({
     accept: ["hdElement", "hdPGElement"],
+    canDrop: (item, monitor) => {
+      /* console.log("Type: ",monitor.getItemType()); */
+      return true;
+    },
     drop: (item, monitor) => {
         //Check if the element is already dropped somewhere, could be a case of Container
         if(monitor.didDrop()) {
           return;
         }
         const {index, element} = item;
-        console.log(item);
+        /* console.log(item); */
         const id = window.crypto.randomUUID();
-        console.log(pgElements);
+        /* console.log(pgElements); */
         if(monitor.getItemType() === "hdPGElement") {
           //Do not create any new element, just reorder them
+          const ele = pgElements.find(ele => ele.id === element.id);
+          if(!ele) {
+            setPGElements(elements => [...elements, {...element, id}])
+          }
+
         } else { //add to the plaground and create the element
           setPGElements(elements => [...elements, {...element, id}])
         }
@@ -89,6 +114,7 @@ const Playground = () => {
               setMeta={setMeta}
               setPGElements={setPGElements}
               pgElements = {pgElements}
+              pgIndex = {index}
               handleWhenElementMovedToContainer={handleWhenElementMovedToContainer}/>)
         )}
       </div>
