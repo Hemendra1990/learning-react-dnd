@@ -16,7 +16,7 @@ function HDContainer({ element , meta, setMeta, handleWhenElementMovedToContaine
     console.log('Container children test', element);
   }, [element]);
 
-  const [{ canDrop, isOver }, drop] = useDrop(() => ({
+  const [{ canDrop, isOver, isOverCurrent }, drop] = useDrop(() => ({
     accept: ["hdPGElement", "hdElement"],
 
     drop: (item, monitor) => {
@@ -61,6 +61,7 @@ function HDContainer({ element , meta, setMeta, handleWhenElementMovedToContaine
     collect: (monitor) => ({
       isOver: monitor.isOver(),
       canDrop: monitor.canDrop(),
+      isOverCurrent: monitor.isOver({ shallow: true }),
     }),
   }), [pgElements]);
 
@@ -81,10 +82,14 @@ function HDContainer({ element , meta, setMeta, handleWhenElementMovedToContaine
 
   const isActive = canDrop && isOver;
   let backgroundColor = "";
-  if (isActive) {
+  /* if (isActive) {
     backgroundColor = "";
   } else if (canDrop) {
-    backgroundColor = "blue";
+    backgroundColor = "gray";
+  } */
+
+  if(isOverCurrent) {
+    backgroundColor="#DCDCDC";
   }
   return <div ref={drop} style={
     {

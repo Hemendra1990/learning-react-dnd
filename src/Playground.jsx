@@ -78,7 +78,7 @@ const Playground = () => {
         }
     },
     collect: (monitor) => ({
-      isOver: monitor.isOver(),
+      isOver: monitor.isOver({shallow: true}),
       canDrop: monitor.canDrop(),
       getDropResult: monitor.getDropResult()
     }),
@@ -86,11 +86,16 @@ const Playground = () => {
 
   const isActive = canDrop && isOver;
   let backgroundColor = "";
-  if (isActive) {
+  /* if (isActive) {
     backgroundColor = "gray";
   } else if (canDrop) {
     backgroundColor = "darkgray";
+  } */
+  if(isOver) {
+    backgroundColor = "#DCDCDC";
   }
+
+
 
   return (
     <>
