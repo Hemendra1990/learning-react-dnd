@@ -1,4 +1,4 @@
-import React, { createElement } from "react";
+import React, { createElement, createRef } from "react";
 import { useDrag } from "react-dnd";
 
 const DraggablePGElement = React.forwardRef((
@@ -22,6 +22,7 @@ const DraggablePGElement = React.forwardRef((
   }));
 
   const createComponent = () => {
+
     return React.createElement(element.component, {
         key: element.id,
         element: element,
@@ -33,7 +34,7 @@ const DraggablePGElement = React.forwardRef((
         pgIndex,
         containerIndex,
         parentId,
-        updatePgElements
+        updatePgElements,
     });
   }
 

@@ -12,6 +12,10 @@ function HDContainer({ element , meta, setMeta, handleWhenElementMovedToContaine
   containerElement.attributes = containerElement.attributes || {};
   containerElement.attributes.children = containerElement.attributes.children || [];
 
+  useEffect(()=> {
+    console.log('Container children test', element);
+  }, [element]);
+
   const [{ canDrop, isOver }, drop] = useDrop(() => ({
     accept: ["hdPGElement", "hdElement"],
 
@@ -94,7 +98,7 @@ function HDContainer({ element , meta, setMeta, handleWhenElementMovedToContaine
       {console.log(`For Container children: ${containerElement.id}: `, containerChildren.length)}
     {
         
-        containerChildren.map((childElement, containerIndex) => {
+        element?.attributes?.children.map((childElement, containerIndex) => {
             return <div key={childElement.id} style={{marginTop: 10, marginBottom: 10}}>
                 <DraggablePGElement 
                 element={childElement} 
