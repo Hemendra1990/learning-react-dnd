@@ -1,33 +1,25 @@
 import React, { useEffect, useState } from "react";
 import { useDrop } from "react-dnd";
 import DraggablePGElement from "./DraggablePGElement";
+import ContainerHelper from "./_helpers/ContainerHelper";
 
-function HDContainer({ element , meta, setMeta, handleWhenElementMovedToContainer, setPGElements, pgElements, pgIndex }) {
+function HDContainer({ element , meta, setMeta, handleWhenElementMovedToContainer, 
+  setPGElements, pgElements, pgIndex, updatePgElements }) {
   const containerElement = element;
 
   const [containerChildren, setContainerChildren] = useState([]);
 
   containerElement.attributes = containerElement.attributes || {};
-      containerElement.attributes.children = containerElement.attributes.children || [];
-
-      /* useEffect(()=>{
-        
-      }, [containerChildren]) */
+  containerElement.attributes.children = containerElement.attributes.children || [];
 
   const [{ canDrop, isOver }, drop] = useDrop(() => ({
     accept: ["hdPGElement", "hdElement"],
-    hover: (item, monitor)=>{
-      console.log(item, monitor);
-    },
-    drop: (item, monitor) => {
-      //console.log('Container Item', item);
 
+    drop: (item, monitor) => {
       //check if the element is already dropped or not
       if(monitor.didDrop()) {
         return;
       }
-
-      console.log(setPGElements, pgElements, findElement);
 
       if(monitor.getItemType() === "hdElement") {
         const newId = window.crypto.randomUUID()
@@ -40,7 +32,7 @@ function HDContainer({ element , meta, setMeta, handleWhenElementMovedToContaine
             if (foundElement) {
               foundElement.attributes = foundElement.attributes || {};
               foundElement.attributes.children = foundElement.attributes.children || [];
-              foundElement.attributes.children.push({...item.element, id: newId});
+              foundElement.attributes.children.push({...item.element, id: newId, parentId: containerElement.id});
               break;
             }
           }
@@ -49,11 +41,17 @@ function HDContainer({ element , meta, setMeta, handleWhenElementMovedToContaine
           ]
         });
       } else if(monitor.getItemType() === "hdPGElement"){
-        //Remove from the main pgElements and add as the child of the container.
-        setContainerChildren(children => [...children, {...item.element}]);
-        //console.log(pgElements);
-        //console.log(setPGElements);
-        handleWhenElementMovedToContainer(item.element, item.index);
+        const helper = new ContainerHelper();
+        pgElements = helper.updateParent(pgElements, item.element.id, containerElement.id);
+
+        console.log(setPGElements, pgElements, findElement);
+        setPGElements([...pgElements]);
+        
+        const newObj = helper.findNodeAndParent(pgElements, containerElement.id)
+        console.log('New Obj', newObj);
+        setContainerChildren([...newObj?.node?.attributes.children]);
+        updatePgElements([...pgElements]);
+
       }
     },
     collect: (monitor) => ({
@@ -80,9 +78,9 @@ function HDContainer({ element , meta, setMeta, handleWhenElementMovedToContaine
   const isActive = canDrop && isOver;
   let backgroundColor = "";
   if (isActive) {
-    backgroundColor = "gray";
-  } else if (canDrop) {
     backgroundColor = "";
+  } else if (canDrop) {
+    backgroundColor = "blue";
   }
   return <div ref={drop} style={
     {
@@ -93,7 +91,9 @@ function HDContainer({ element , meta, setMeta, handleWhenElementMovedToContaine
       backgroundColor: backgroundColor,
     }
     }>
+      {console.log(`For Container children: ${containerElement.id}: `, containerChildren.length)}
     {
+        
         containerChildren.map((childElement, containerIndex) => {
             return <div key={childElement.id} style={{marginTop: 10, marginBottom: 10}}>
                 <DraggablePGElement 
@@ -102,7 +102,8 @@ function HDContainer({ element , meta, setMeta, handleWhenElementMovedToContaine
                 meta={meta} 
                 setMeta={setMeta}
                 setPGElements={setPGElements}
-              pgElements = {pgElements}
+                parentId={containerElement.id}
+                pgElements = {pgElements}
                 containerIndex={containerIndex}/>
             </div>
         })

@@ -1,16 +1,27 @@
-import React, { createElement, useRef, useState } from "react";
+import React, { createElement, useImperativeHandle, useRef, useState } from "react";
 import { useDrag, useDrop } from "react-dnd";
 import elements from "./Components";
 import ControlPanel from "./ControlPanel";
 import DraggablePGElement from "./DraggablePGElement";
 
 const Playground = () => {
+  const playgroundRef = useRef(null);
     const sharedMeta = {
         elements: []
     };
   const [meta, setMeta] = useState(sharedMeta);
 
   const [pgElements, setPGElements] = useState([]);
+
+  useImperativeHandle(playgroundRef, () => ({
+    updatePlayground(newPGElements) {
+      setPGElements(newPGElements);
+    }
+  }));
+
+  function updatePgElements(newElements) {
+    setPGElements([...newElements]);
+  }
 
   function deleteElement(array, element) {
     for (let i = 0; i < array.length; i++) {
@@ -65,6 +76,7 @@ const Playground = () => {
       getDropResult: monitor.getDropResult()
     }),
   }), [pgElements]);
+
   const isActive = canDrop && isOver;
   let backgroundColor = "";
   if (isActive) {
@@ -107,6 +119,8 @@ const Playground = () => {
       >
         {console.log("pg Elements:",pgElements.length, pgElements)}
         {pgElements.map((element, index) => (
+            <>
+            <h2>{new Date().toLocaleTimeString()}</h2>
             <DraggablePGElement 
               key={element.id} 
               element={element} 
@@ -115,7 +129,9 @@ const Playground = () => {
               setPGElements={setPGElements}
               pgElements = {pgElements}
               pgIndex = {index}
-              handleWhenElementMovedToContainer={handleWhenElementMovedToContainer}/>)
+              updatePgElements = {updatePgElements}
+              handleWhenElementMovedToContainer={handleWhenElementMovedToContainer}/>
+            </>)
         )}
       </div>
     </>
