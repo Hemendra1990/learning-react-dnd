@@ -11,6 +11,16 @@ export default class ContainerHelper {
       if(parent && parent.attributes && parent.attributes.children) {
         parent.attributes.children = parent.attributes.children.filter((child: any) => child.id !== elementId); 
       }
+      //remove from play ground
+      if(!parent )
+      {
+        let indexOfElement=elements.findIndex(ele=> ele.id===elementId);
+        if(indexOfElement!=undefined && indexOfElement>-1)
+        {
+          elements.splice(indexOfElement,1);
+        }
+        // elements=elements.splice(elements.indexOf(elements.find(f=>f.id===node.id)),1)
+      }
 
       const newParentContainer = this.findNodeAndParent([...elements], newParentId)
       //After removing add to the new Parent
