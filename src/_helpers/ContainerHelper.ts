@@ -6,7 +6,11 @@ export default class ContainerHelper {
 
     if(result) {
       const {node, parent} = result;
-
+      //if droped element drop in itself
+      if(newParentId === node.id)
+      {
+        return elements;
+      }
       //remove the node from the current parent
       if(parent && parent.attributes && parent.attributes.children) {
         parent.attributes.children = parent.attributes.children.filter((child: any) => child.id !== elementId); 
