@@ -1,10 +1,13 @@
-import React, { createElement, useImperativeHandle, useRef, useState } from "react";
+import React, { createElement, useCallback, useImperativeHandle, useRef, useState } from "react";
 import { useDrag, useDrop } from "react-dnd";
 import elements from "./Components";
 import ControlPanel from "./ControlPanel";
 import DraggablePGElement from "./DraggablePGElement";
+import update from "immutability-helper"
+import ContainerHelper from "./_helpers/ContainerHelper";
 
 const Playground = () => {
+  const helper = new ContainerHelper();
   const playgroundRef = useRef(null);
     const sharedMeta = {
         elements: []
@@ -43,6 +46,18 @@ const Playground = () => {
     setPGElements([...pgElements]);
     console.log('pgElements Length: ', pgElements.length);
   }
+
+  const moveCard = useCallback((dragIndex, hoverIndex, item, monitor) => {
+    if(dragIndex !== undefined && hoverIndex !== undefined) {
+      console.log({dragIndex, hoverIndex});
+      const {node, parent} = helper.findNodeAndParent(pgElements, item.element.id);
+      if(node && pgElements[hoverIndex]) {//check if any element is already there at the index or not
+        const [draggedItem] = pgElements.splice(dragIndex, 1);
+        pgElements.splice(hoverIndex, 0, draggedItem);
+      }
+    }
+
+  }, [pgElements])
 
   const [{ canDrop, isOver, getDropResult }, drop] = useDrop(() => ({
     accept: ["hdElement", "hdPGElement"],
@@ -135,7 +150,8 @@ const Playground = () => {
               pgElements = {pgElements}
               pgIndex = {index}
               updatePgElements = {updatePgElements}
-              handleWhenElementMovedToContainer={handleWhenElementMovedToContainer}/>
+              moveCard={moveCard}
+            />
             </>)
         )}
       </div>
