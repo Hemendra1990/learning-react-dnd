@@ -3,7 +3,6 @@ import { useDrag, useDrop } from "react-dnd";
 import elements from "./Components";
 import ControlPanel from "./ControlPanel";
 import DraggablePGElement from "./DraggablePGElement";
-import update from "immutability-helper"
 import ContainerHelper from "./_helpers/ContainerHelper";
 
 const Playground = () => {
@@ -75,12 +74,18 @@ const Playground = () => {
         const id = window.crypto.randomUUID();
         /* console.log(pgElements); */
         if(monitor.getItemType() === "hdPGElement") {
-          //Do not create any new element, just reorder them
-          const ele = pgElements.find(ele => ele.id === element.id);
-          if(!ele) {
-            setPGElements(elements => [...elements, {...element, id}])
+          const helper = new ContainerHelper();
+          const result = helper.findNodeAndParent([...pgElements], element.id);
+          const {node, parent} = result;
+          if(parent && parent.attributes && parent.attributes.children) {
+            parent.attributes.children = parent.attributes.children.filter((child) => child.id !== element.id); 
+            setPGElements(elements => [...elements, {...node}])
           }
-
+          //Do not create any new element, just reorder them
+          // const ele = pgElements.find(ele => ele.id === element.id);
+          // if(!ele) {
+          //   setPGElements(elements => [...elements, {...element, id}])
+          // }
         } else { //add to the plaground and create the element
           setPGElements(elements => [...elements, {...element, id}])
         }
@@ -138,6 +143,7 @@ const Playground = () => {
         }
       >
         {console.log("pg Elements:",pgElements.length, pgElements)}
+        {console.log("meta:",meta)}
         {pgElements.map((element, index) => (
             <>
             <h2>{new Date().toLocaleTimeString()}</h2>

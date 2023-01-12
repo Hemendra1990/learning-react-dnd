@@ -47,7 +47,7 @@ function HDContainer({ element , meta, setMeta, handleWhenElementMovedToContaine
       } else if(monitor.getItemType() === "hdPGElement"){
         const helper = new ContainerHelper();
         pgElements = helper.updateParent(pgElements, item.element.id, containerElement.id);
-
+        //check 
         console.log(setPGElements, pgElements, findElement);
         setPGElements([...pgElements]);
         
@@ -100,7 +100,6 @@ function HDContainer({ element , meta, setMeta, handleWhenElementMovedToContaine
       backgroundColor: backgroundColor,
     }
     }>
-      {console.log(`For Container children: ${containerElement.id}: `, containerChildren.length)}
     {
         
         element?.attributes?.children.map((childElement, containerIndex) => {
