@@ -1,4 +1,22 @@
 export default class ContainerHelper {
+  IsParentDropedOnChildren(dropedEle:any ,newParentId:string){
+    if(dropedEle && dropedEle.attributes && dropedEle.attributes.children && dropedEle.attributes?.children.length!==0)
+    {
+      if(dropedEle.attributes?.children.find((f:any)=>f.id===newParentId)!==undefined )
+      {
+        return true;
+      }
+      else
+      {
+        this.IsParentDropedOnChildren(dropedEle.attributes?.children,newParentId);
+      }
+      
+    }
+    else{
+      return false
+    }
+
+  }
   updateParent(elements: Array<any>, elementId: string, newParentId: string) {
     console.log('Before Updation', elements);
     const result = this.findNodeAndParent([...elements], elementId);
@@ -11,6 +29,11 @@ export default class ContainerHelper {
       {
         return elements;
       }
+      
+      if(node && node.attributes?.children &&  this.IsParentDropedOnChildren(node,newParentId))
+      {
+        return elements;
+      }
       //remove the node from the current parent
       if(parent && parent.attributes && parent.attributes.children) {
         parent.attributes.children = parent.attributes.children.filter((child: any) => child.id !== elementId); 
@@ -19,7 +42,7 @@ export default class ContainerHelper {
       if(!parent )
       {
         let indexOfElement=elements.findIndex(ele=> ele.id===elementId);
-        if(indexOfElement!=undefined && indexOfElement>-1)
+        if(indexOfElement!==undefined && indexOfElement>-1)
         {
           elements.splice(indexOfElement,1);
         }
