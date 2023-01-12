@@ -142,8 +142,6 @@ const Playground = () => {
           }
         }
       >
-        {console.log("pg Elements:",pgElements.length, pgElements)}
-        {console.log("meta:",meta)}
         {pgElements.map((element, index) => (
             <>
             <h2>{new Date().toLocaleTimeString()}</h2>
