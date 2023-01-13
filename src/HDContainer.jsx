@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { useDrop } from "react-dnd";
 import DraggablePGElement from "./DraggablePGElement";
 import ContainerHelper from "./_helpers/ContainerHelper";
@@ -6,6 +6,7 @@ import ContainerHelper from "./_helpers/ContainerHelper";
 function HDContainer({ element , meta, setMeta, handleWhenElementMovedToContainer, 
   setPGElements, pgElements, pgIndex, updatePgElements }) {
   const containerElement = element;
+  const helper = new ContainerHelper();
 
   const [containerChildren, setContainerChildren] = useState([]);
 
@@ -80,6 +81,18 @@ function HDContainer({ element , meta, setMeta, handleWhenElementMovedToContaine
     return null;
   }
 
+  const moveContainerCard = useCallback((dragIndex, hoverIndex, item, monitor) => {
+    if(dragIndex !== undefined && hoverIndex !== undefined) {
+      console.log({dragIndex, hoverIndex});
+      const {node, parent} = helper.findNodeAndParent(pgElements, item.element.id);
+      /* if(node && pgElements[hoverIndex]) {//check if any element is already there at the index or not
+        const [draggedItem] = pgElements.splice(dragIndex, 1);
+        pgElements.splice(hoverIndex, 0, draggedItem);
+      } */
+    }
+
+  }, [pgElements])
+
   const isActive = canDrop && isOver;
   let backgroundColor = "";
   /* if (isActive) {
@@ -112,6 +125,7 @@ function HDContainer({ element , meta, setMeta, handleWhenElementMovedToContaine
                 setPGElements={setPGElements}
                 parentId={containerElement.id}
                 pgElements = {pgElements}
+                moveContainerCard = {moveContainerCard}
                 containerIndex={containerIndex}/>
             </div>
         })

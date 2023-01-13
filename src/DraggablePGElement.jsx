@@ -16,6 +16,7 @@ const DraggablePGElement = React.forwardRef(
       parentId,
       updatePgElements,
       moveCard,
+      moveContainerCard
     },
     ref
   ) => {
@@ -74,7 +75,11 @@ const DraggablePGElement = React.forwardRef(
           return;
         }
         // Time to actually perform the action
-        moveCard(dragIndex, hoverIndex, item, monitor);
+        if(moveCard) {
+          moveCard(dragIndex, hoverIndex, item, monitor);
+        } else if(moveContainerCard) {
+          moveContainerCard(dragIndex, hoverIndex, item, monitor);
+        }
         // Note: we're mutating the monitor item here!
         // Generally it's better to avoid mutations,
         // but it's good here for the sake of performance
