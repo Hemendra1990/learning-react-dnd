@@ -8,7 +8,23 @@ export default class ContainerHelper {
       }
       else
       {
-        this.IsParentDropedOnChildren(dropedEle.attributes?.children,newParentId);
+        if(Array.isArray(dropedEle.attributes?.children))
+        {
+          let result:any=false;
+          for(var i=0; i<dropedEle.attributes?.children.length;i++)
+          {
+            result =this.IsParentDropedOnChildren(Object.assign({},dropedEle.attributes?.children[i]) ,newParentId);
+            if(result)
+            {
+              return result;
+            }
+          }
+
+        
+        }else{
+          this.IsParentDropedOnChildren(Object.assign({},dropedEle.attributes?.children) ,newParentId);
+        }
+        
       }
       
     }
